@@ -1,0 +1,115 @@
+{%extends "shop/basic.html" %}
+
+{% block title %} Tracker - My awesome cart {% endblock %}
+
+{% block css %}
+#trackerCurrent{
+color: rgb(212, 212, 212);
+}
+{% endblock %}
+
+{% block body %}
+
+<div class="container">
+    <div class="col my-4">
+        <h2> Tracker - Track your order</h2>
+        <form action="#" method="POST" id="trackerForm"> {% csrf_token %}
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="orderid">Enter Order ID</label>
+                    <input type="name" class="form-control" id="orderid" name="orderid" placeholder="Order ID">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="email">Enter Email</label>
+                    <input type="email" class="form-control" id="email" placeholder="Email" name="email">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Track Order</button>
+        </form>
+    </div>
+
+    <div class="col my-4">
+        <h2>Your Order Status :</h2>
+        <div class="my-4">
+            <ul class="list-group" id="items">
+                Enter your order Id and Email and click Track Order to find details about your order!
+            </ul>
+        </div>
+    </div>
+
+    <div class="col my-4">
+        <h2>Your Order Details :</h2>
+        <div class="my-4">
+            <ul class="list-group" id="citems">
+                
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+$('#trackerForm').submit(function(event) {
+    $('#items').empty();
+    var formData = {
+        'orderid': $('input[name=orderid]').val(),
+        'email': $('input[name=email]').val(),
+        'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+    };
+    $.ajax({
+            type: 'POST',
+            url: '/shop/tracker/',
+            data: formData,
+            encode: true
+        })
+        .done(function(data) {
+            data = JSON.parse(data);
+            updates = data[0];
+            if (updates.length > 0 & updates != {}) {
+                for (i = 0; i < updates.length; i++) {
+                    let text = updates[i]['text'];
+                    let time = updates[i]['time'];
+                    mystr = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                    ${text}
+                    <span class="badge badge-primary badge-pill">${time}</span>
+                </li>`
+                    $('#items').append(mystr);
+                }
+            } else {
+                mystr = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                    Sorry, We are not able to fetch this order id and email. Make sure to type correct order Id and email</li>`
+                $('#items').append(mystr);
+            }
+
+            //print order details
+            cart = JSON.parse(data[1]);
+            console.log(cart)
+            var str = "";
+            var totalPrice = 0;
+            for (var item in cart) {
+                console.log(item);
+                let name = cart[item][1];
+                let qty = cart[item][0];
+                let price = cart[item][2];
+                let cnt = 1;
+                totalPrice += price * qty;
+                str += `<li class="list-group-item d-flex justify-content-between align-items-center">
+                ${cnt}. ${name}
+                <span class="badge badge-primary badge-pill">${qty} × Rs. ${price}</span>
+                </li>`
+                cnt += 1;
+            }
+            str += `<p class=" d-flex justify-content-between align-items-center my-4"> -
+                <span class="badge badge-primary badge-pill" id="totalPrice" style='font-size:20px;'>
+                    Total = Rs. ${totalPrice}
+                </span>
+            </p>`
+            $('#citems').append(str);
+
+        });
+    event.preventDefault();
+});
+</script>
+{% endblock %}

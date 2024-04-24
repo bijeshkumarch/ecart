@@ -1,0 +1,154 @@
+{%extends "shop/basic.html" %}
+
+{% block title %} {{product.product_name}} - My Awesome Cart {% endblock %}
+
+{% block body %} 
+
+<div class="container my-4">
+  <div class="row">
+    <div class="col-md-4">
+        <div class="row">
+            <img src="/media/{{product.image}}" width=425px height=425px>
+        </div>
+        <div class="row mx-5">
+
+          <span id="divpr{{product.id}}" class="divpr">
+            <button id="pr{{product.id}}" class="btn btn-primary cart mx-2" style="background-color:gray; border-color:grey;">Add to cart</button>
+            </span>            
+            
+            <button  class="btn btn-primary mx-2">Buy now</button>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <h5 id="name{{product.id}}">{{product.product_name}}</h5>
+        <p><b>Rs. {{product.price}}</b></p>
+        <p>{{product.desc}}</p>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+
+    // function to calculate the sum of elements of an array
+    function sum(arr){
+      sm = 0
+      for(let i=0; i<arr.length; i++)
+          sm += arr[i][0]
+      return sm
+    }
+
+    if(localStorage.getItem("cart") == null){
+      var cart = {};
+    }
+    else{
+      cart = JSON.parse(localStorage.getItem("cart"));
+      document.getElementById('cart').innerHTML = sum(Object.values(cart));
+    }
+
+
+    // update "add to cart button" when loading the page
+    if(cart["pr" + "{{id}}"]!=undefined){
+         updateCart("pr" + "{{id}}");
+         updatePopover(cart);
+    }
+
+    
+    // add to cart button action
+    $(".divpr").on('click', 'button.cart', function(){
+      var idStr = this.id.toString();
+      if(cart[idStr]!=undefined){
+        cart[idStr] = cart[idStr][0] + 1;
+      }
+      else{
+        //console.log(idStr.slice(2));
+        cart[idStr] = [1, document.getElementById("name" + idStr.slice(2)).innerHTML];
+      }
+
+      updateCart(idStr);
+      updatePopover(cart);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      document.getElementById("cart").innerHTML = sum(Object.values(cart));
+    });
+
+
+    // minus button of add to cart functioning
+    $(".divpr").on('click', 'button.minus', function(){
+      var idStr = this.id.toString().slice(5);
+      if(cart[idStr]!=undefined && cart[idStr][0]>1){
+          cart[idStr][0] -= 1;
+          document.getElementById("val" + idStr).innerHTML = cart[idStr][0];
+      }
+      else{
+          delete cart[idStr];
+          document.getElementById('div'+idStr).innerHTML = "<button id='" + idStr + "' class='btn btn-primary cart mx-2' style='background-color:gray; border-color:grey;'>Add to cart</button>";
+      }
+      
+      localStorage.setItem("cart", JSON.stringify(cart));
+      document.getElementById("cart").innerHTML = sum(Object.values(cart));
+      updatePopover(cart);
+    });
+
+    // plus button of add to cart functioning
+    $(".divpr").on('click', 'button.plus', function(){
+      var idStr = this.id.toString().slice(4);
+      cart[idStr][0] += 1;
+
+      localStorage.setItem("cart", JSON.stringify(cart));
+      document.getElementById("cart").innerHTML = sum(Object.values(cart));
+      document.getElementById("val" + idStr).innerHTML = cart[idStr][0];
+      updatePopover(cart);
+    });
+
+    // update cart function to change 'add to cart' button
+    function updateCart(item){
+        document.getElementById('div' + item).innerHTML = "<button id='minus" + item + "' class='btn btn-primary minus'>-</button> <span id='val" + item + "''>" + cart[item][0] + "</span> <button id='plus" + item + "' class='btn btn-primary plus'>+</button>";
+    }
+
+    // popover update function
+  function updatePopover(cartRef){
+    //console.log(cart);
+    var str = "<b>Your products are here</b><br><div class='mx-2 my-2 test'>";
+    var cnt = 1;
+    for(var item in cartRef){
+      str += cnt +". " + cartRef[item][1].slice(0, 20) +"..." + ": " + cartRef[item][0] + "<br>";
+      cnt+=1;
+    }
+
+    
+    str += "</div><a href='#' class='btn btn-primary' id ='checkout'>Checkout</a> <a href='#' class='btn btn-primary clearCart' id ='clearCart'>Clear Cart</a>";
+
+    var pop = document.getElementById('myPopover');
+    pop.setAttribute('data-bs-content', str);
+    $("#myPopover").popover('hide');
+    $("#myPopover").popover('disable');
+    new bootstrap.Popover(pop);
+    }
+
+    // clear cart function
+    $(document).on('click', '.clearCart', function(){
+      cart = JSON.parse(localStorage.getItem('cart'));
+      document.getElementById('divpr' + "{{id}}").innerHTML = "<button id='" + "pr{{id}}" + "' class='btn btn-primary cart' style='background-color:gray; border-color:grey;'>Add to cart</button>";
+
+
+        localStorage.clear();
+        cart = {};
+        localStorage.setItem('cart', JSON.stringify(cart));
+        document.getElementById('cart').innerHTML = 0;
+
+        //updateCart("pr{{id}}");
+        updatePopover(cart);
+    });
+
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+  return new bootstrap.Popover(popoverTriggerEl);
+});
+
+
+</script>
+{% endblock %}

@@ -1,0 +1,94 @@
+{%extends "shop/basic.html" %}
+{% load static %}
+{% block title %} Contact us - My awesome cart {% endblock %}
+
+{% block css %}
+    #contactCurrent{
+        color: rgb(212, 212, 212);
+    }
+    .form-control{
+        background: rgb(245, 242, 242);
+        width: 750px;
+        align: 
+    }
+    .frm{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+{% endblock %}
+
+{% block body %} 
+
+<div class="container my-4">
+<h1>Contact Us</h1>
+<hr>
+ <div class="container frm my-4">
+     
+     <form action="/shop/contact/" method="post">{% csrf_token %}
+
+
+    <div class="form-group">
+    <label for="name">Name</label>
+    <input type="text" class="form-control" id="name" name="name" placeholder="Enter Your Name">
+  </div>
+
+    <div class="form-group">
+    <label for="name">Email</label>
+    <input type="email" class="form-control" id="email" name="email" placeholder="Enter Your Email">
+  </div>
+
+    <div class="form-group">
+    <label for="name">Phone</label>
+    <input type="tel" class="form-control" id="phone" name="phone" placeholder="Enter Your Phone Number">
+  </div>
+
+   <div class="form-group">
+    <label for="desc">How May We Help You ?</label>
+    <textarea class="form-control" id="desc" name="desc" rows="3"></textarea>
+  </div>
+
+  <button type="submit" class="btn btn-success">Submit</button>
+  </form>
+ </div>
+
+<hr>
+
+ <div class="row">
+    <div class="col">
+        <a href="mailto: bijeshchaurasia1@gmail.com"><img src="{% static 'shop/gmail logo.png' %}" width="150"></a>
+    </div>
+
+    <div class="col">
+        <a href="https://github.com/bijeshkumarch"><img src="{% static 'shop/github logo.png' %}" width="100" style="margin-top: 10px;"></a>
+    </div>
+
+    <div class="col">
+        <a href="https://www.linkedin.com/in/bijeshkumarch/"><img src="{% static 'shop/linkedin logo.png' %}" width="100" ></a>
+    </div>
+
+    <div class="col">
+        <a href="https://www.facebook.com/bijeshkchaurasiya"><img src="{% static 'shop/fb logo.png' %}" width="150" style="margin-top: 7px;"></a>
+    </div>
+
+    <div class="col">
+        <a href="https://www.instagram.com/bijesh_chaurasia/" > <img src="{% static 'shop/instagram logo.jpg' %}" width="80" style="margin-top: 12px;"> </a>
+    </div>
+
+    <div class="col">
+        <a href="https://wa.me/919934901498"><img src="{% static 'shop/whatsapp logo.png' %}" width="80" style="margin-top: 10px;"></a>
+    </div>
+ </div>
+</div>
+
+ 
+{% endblock %}
+
+{% block js %}
+<script>
+    {% if status %}
+    alert("Thank you for contacting us.");
+    document.location = "/shop";
+    {% endif %}
+</script>
+{% endblock %}

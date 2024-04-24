@@ -1,0 +1,128 @@
+<!doctype html5>
+<html lang="en">
+  {% load static %}
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!--Wesite icon-->
+    <link href="{% static 'shop/logo.png' %}" rel="shortcut icon" type="Images/x-icon" style="border-radius:10px;">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    
+
+    <title>{% block title %} {% endblock %}</title>
+      <style>{% block css %} {% endblock %}</style>
+  </head>
+  <body>
+  
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="/shop">My Awesome Cart</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="/shop">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/shop/tracker" id="trackerCurrent">Tracker</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/shop/about" id="aboutCurrent">About Us</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/shop/contact" id="contactCurrent">Contact Us</a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="/blog" id="blog">Blog</a>
+      </li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+      <button id="searchButton" class="btn btn-outline-success my-2 my-sm-0" >Search</button>
+    </form>
+    <button style="backgroung-color:white;" type="button" data-bs-html="true" class="btn btn-secondary mx-2 myPopover" id="myPopover" data-bs-container="body"  data-bs-toggle="popover" data-bs-placement="bottom" data-bs-content="<div><b>Your products are here</b></div>" title="Cart">
+      <img src="{% static 'shop/logo.png' %}" height=30px width=30px style="border-radius: 50%"> <sup style="background-color:rgb(255, 0, 0);border-radius:10px; margin-left:-5px; top:-0.75em"><b><span id ="cart">0</span></sup></b>
+    </button>
+    
+  </div>
+</nav>
+
+
+
+{% block body %} {% endblock %}
+
+
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    {% block js %} {% endblock %}
+
+
+  </body>
+
+  <script>
+
+    // function to calculate the sum of elements of an array
+    function sum(arr){
+      sm = 0
+      for(let i=0; i<arr.length; i++)
+          sm += arr[i][0]
+      return sm
+    }
+
+    // Fetch the value of cart from localStorage
+    if(localStorage.getItem("cart") == null){
+      var cart = {};
+    }
+    else{
+      cart = JSON.parse(localStorage.getItem("cart"));
+      document.getElementById('cart').innerHTML = sum(Object.values(cart));
+      updatePopover(cart);
+    }
+
+
+    // popover update function
+  function updatePopover(cartRef){
+    //console.log(cart);
+    var str = "<b>Your products are here</b><br><div class='mx-2 my-2 test'>";
+    var cnt = 1;
+    let totalPrice = 0;
+    for(var item in cartRef){
+      str += cnt +". " + cartRef[item][1].slice(0, 20)+"..." + ": " + cartRef[item][0] + "<br>";
+      totalPrice += cartRef[item][2]*cartRef[item][0];
+      cnt+=1;
+    }
+
+    str += `</div><b>Total Price = Rs. ${totalPrice} </b><br>`;
+    str += "</div><a href='/shop/checkout' class='btn btn-primary' id ='checkout'>Checkout</a> <a href='#' class='btn btn-primary clearCart' id ='clearCart'>Clear Cart</a>";
+
+    var pop = document.getElementById('myPopover');
+    pop.setAttribute('data-bs-content', str);
+    $("#myPopover").popover('hide');
+    $("#myPopover").popover('disable');
+    new bootstrap.Popover(pop);
+    }
+
+
+
+  // show popover
+  var pop = document.getElementById("myPopover");
+  var popovered = new bootstrap.Popover(pop);
+  
+
+  
+  </script>
+
+</html>
